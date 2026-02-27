@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Astheticbouquet | Build Your Realistic Bouquet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --page-bg: #FBF9F2;
+            --accent: #000;
+            --note-bg: #fff;
+            --error-red: #ff4d4d;
+        }
+
+        body {
+            background-color: #eee;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+
+        /* Mobile Container to mimic app screen */
+        .mobile-viewport {
+            background-color: var(--page-bg);
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Logo and Shared Header */
+        header {
+            text-align: center;
+            margin-top: 20px;
+            padding: 0 10px;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem;
+            font-style: italic;
+            margin: 0;
+            user-select: none;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #444;
+            margin-top: -5px;
+        }
+
+        /* --- Canvas Management --- */
+        .app-canvas {
+            display: none; /* All hidden by default */
+            flex: 1;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .app-canvas.active {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+        }
+
+        /* Shared Button Style */
+        .app-btn {
+            background-color: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: auto;
+            margin-bottom: 20px;
+        }
+
+        .app-btn.next {
+            margin-top: 20px;
+        }
+
+        /* --- CANVAS 1: SAMPLE & INTRO --- */
+        .canvas1-intro {
+            align-items: center;
+            text-align: center;
+        }
+
+        .main-sample-image {
+            width: 100%;
+            max-width: 380px;
+            height: auto;
+            margin-top: 20px;
+        }
+
+        /* --- CANVAS 2: FLOWER PICKER (20 Options) --- */
+        .picker-header {
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+
+        .counter-pill {
+            background: #000;
+            color: #fff;
+            width: fit-content;
+            padding: 6px 20px;
+            border-radius: 20px;
+            margin: 10px auto;
+            font-size: 0.9rem;
+        }
+
+        .counter-pill .error-msg {
+            color: var(--error-red);
+            font-size: 0.8rem;
+            display: none;
+        }
+
+        .flower-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 30px;
+        }
+
+        .flower-item {
+            background: #fff;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .flower-item.selected {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+            box-shadow: 0 4px 10px rgba(255,107,107,0.15);
+        }
+
+        .flower-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .flower-item span {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* --- CANVAS 3: NOTE MODIFICATION --- */
+        .note-inputs {
+            margin-top: 20px;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            box-sizing: border-box;
+            background: #fff;
+        }
+
+        textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        .note-preview-sample {
+            margin-top: 20px;
+            border: 1px solid var(--accent);
+            padding: 25px;
+            background: var(--note-bg);
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.06);
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .preview-dear { font-size: 1.1rem; }
+        .preview-body { font-size: 1.1rem; margin: 25px 0; font-style: italic; color: #555;}
+        .preview-sincerely { font-size: 1.1rem; text-align: right; margin-top: 20px; }
+
+        /* --- CANVAS 4: FINAL RECREATION & SHARE --- */
+        .canvas4-final {
+            align-items: center;
+        }
+
+        .final-realistic-bouqet-image {
+            width: 100%;
+            max-width: 380px;
+            margin-top: 20px;
+        }
+
+        .share-row {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .share-btn {
+            background-color: var(--note-bg);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            flex: 1;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .share-btn:hover {
+            background-color: #eee;
+        }
+
+        .social-icons-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            font-size: 1.3rem;
+        }
+
+        .view-garden-link {
+            text-align: center;
+            margin-top: 30px;
+            color: #333;
+            font-weight: 500;
+            display: block;
+        }
+
+        /* --- SHARED FOOTER --- */
+        footer {
+            margin-top: auto;
+            padding: 30px 20px 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #777;
+            border-top: 1px solid #eee;
+        }
+
+        footer p { margin: 4px 0; }
+
+        .footer-powered { text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
+        .footer-made-by { margin-bottom: 10px; font-weight: 600; color: #000;}
+        .footer-made-by a { color: #000; text-decoration: none;}
+
+        .footer-dev { margin-top: 15px !important; }
+        .footer-dev a { color: #333; }
+
+    </style>
+</head>
+<body>
+
+    <div class="mobile-viewport">
+        
+        <header>
+            <h1 class="logo">Astheticbouquet</h1>
+            <p class="subtitle" id="global-subtitle">Hi, build your unique bouquet!</p>
+        </header>
+
+        <main class="app-canvas canvas1-intro active" id="canvas1">
+            <img src="https://image_gen_content.googleusercontent.com/image_generation_content/0" alt="Sample of final realistic Astheticbouquet with a personalized note card." class="main-sample-image">
+            <button class="app-btn" onclick="goToCanvas(2)">Create 💐</button>
+        </main>
+
+        <main class="app-canvas canvas2-picker" id="canvas2">
+            <h2 class="picker-header">Pick minimum 10 Blooms</h2>
+            <div class="counter-pill">
+                <span id="select-count">0</span> / 20 Selected
+                <span class="error-msg" id="select-error"></span>
+            </div>
+            
+            <div class="flower-grid" id="flower-grid">
+                </div>
+
+            <button class="app-btn next" onclick="goToCanvas(3)">Next</button>
+        </main>
+
+        <main class="app-canvas canvas3-note" id="canvas3">
+            <div class="note-inputs">
+                <input type="text" id="input-dear" placeholder="Dear [Name]" oninput="updateNotePreview()">
+                <textarea id="input-message" placeholder="Proposal, Birthday wish, or a loving message..." oninput="updateNotePreview()"></textarea>
+                <input type="text" id="input-from" placeholder="Sincerely, [Your Name]" oninput="updateNotePreview()">
+            </div>
+
+            <div class="note-preview-sample" id="final-note-area">
+                <p class="preview-dear">Dear <span id="preview-dear"></span>,</p>
+                <p class="preview-body" id="preview-message">Your custom message will appear here...</p>
+                <p class="preview-sincerely">Sincerely, <span id="preview-from"></span></p>
+            </div>
+
+            <button class="app-btn next" onclick="generateFinalBouquet()">Create Bouquet</button>
+        </main>
+
+        <main class="app-canvas canvas4-final" id="canvas4">
+            <img src="https://image_gen_content.googleusercontent.com/image_generation_content/1" alt="The final realistic creation based on your 10+ chosen blooms and your customized note card." class="final-realistic-bouqet-image">
+            
+            <div class="share-row">
+                <a href="#" target="_blank" class="share-btn" id="share-sms">Share via Text</a>
+                <a href="#" target="_blank" class="share-btn" id="share-email">Share via Email</a>
+            </div>
+
+            <a href="#" class="view-garden-link">VIEW GARDEN</a>
+        </main>
+
+        <footer>
+            <div class="footer-credits">
+                <p class="footer-made-by">MADE BY: <a href="https://dipeshkharel.qzz.io" target="_blank">dipeshkharel.qzz.io</a></p>
+                <p class="footer-powered">POWERED BY: MR_DIPESH</p>
+                <p class="footer-dev">Web Developer: <a href="https://www.instagram.com/its_mr_hsepid?igsh=amhuZGJxZ29nZjNu" target="_blank">@Its_mr_hsepid</a></p>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        const FLOWER_OPTIONS =;
+
+        let selectedFlowers =;
+
+        // --- Initialization ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('flower-grid');
+            FLOWER_OPTIONS.forEach(f => {
+                const item = document.createElement('div');
+                item.className = 'flower-item';
+                item.innerHTML = `<img src="${f.img}" alt="${f.name}"><span>${f.name}</span>`;
+                item.onclick = () => toggleFlower(f.name, item);
+                grid.appendChild(item);
+            });
+            updateNotePreview(); // Initialize default note text
+        });
+
+        // --- Core Navigation ---
+        function goToCanvas(canvasNum) {
+            // Check constraints
+            if (canvasNum === 3) {
+                if (selectedFlowers.length < 10) {
+                    showPickerError('Please choose minimum 10 flowers.');
+                    return;
+                }
+            }
+
+            // Update UI
+            document.querySelectorAll('.app-canvas').forEach(c => c.classList.remove('active'));
+            document.getElementById(`canvas${canvasNum}`).classList.add('active');
+
+            // Set subtitles for context
+            const sub = document.getElementById('global-subtitle');
+            if (canvasNum === 1) sub.innerText = 'Hi, build your unique bouquet!';
+            if (canvasNum === 2) sub.innerText = 'Choose minimum 10 blossoms.';
+            if (canvasNum === 3) sub.innerText = 'Personalize your message.';
+            if (canvasNum === 4) sub.innerText = 'You made this for them!';
+        }
+
+        // --- Flower Selection (Canvas 2) ---
+        function toggleFlower(name, element) {
+            const index = selectedFlowers.indexOf(name);
+            if (index > -1) {
+                selectedFlowers.splice(index, 1);
+                element.classList.remove('selected');
+                hidePickerError();
+            } else {
+                if (selectedFlowers.length < 20) {
+                    selectedFlowers.push(name);
+                    element.classList.add('selected');
+                    hidePickerError();
+                } else {
+                    showPickerError('Max 20 flowers allowed.');
+                }
+            }
+            document.getElementById('select-count').innerText = selectedFlowers.length;
+        }
+
+        function showPickerError(msg) {
+            const err = document.getElementById('select-error');
+            err.innerText = msg;
+            err.style.display = 'block';
+        }
+
+        function hidePickerError() {
+            document.getElementById('select-error').style.display = 'none';
+        }
+
+        // --- Note Modification (Canvas 3) ---
+        function updateNotePreview() {
+            // Sync inputs to the stylized note sample in Canvas 3
+            document.getElementById('preview-dear').innerText = document.getElementById('input-dear').value || '';
+            document.getElementById('preview-message').innerText = document.getElementById('input-message').value || 'Your custom message will appear here...';
+            document.getElementById('preview-from').innerText = document.getElementById('input-from').value || '';
+        }
+
+        // --- Final Recreation (Go to Canvas 4) ---
+        function generateFinalBouquet() {
+            // Generate SMS share link
+            const noteText = `I made you a personalized bouquet on Astheticbouquet!\n\n${document.getElementById('final-note-area').innerText}\n\nYou can make yours here: ${window.location.href}`;
+            const smsHref = `sms:?&body=${encodeURIComponent(noteText)}`;
+            document.getElementById('share-sms').setAttribute('href', smsHref);
+
+            // Generate Email share link
+            const emailSubject = `A customized bouquet from Astheticbouquet`;
+            const emailBody = `Check out this creation I made for you!\n\n${document.getElementById('final-note-area').innerText}\n\nYou can make yours here: ${window.location.href}`;
+            const emailHref = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+            document.getElementById('share-email').setAttribute('href', emailHref);
+
+            goToCanvas(4); // Move to final view
+        }
+
+    </script>
+</body>
+</html>
+
