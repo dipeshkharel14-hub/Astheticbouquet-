@@ -76,7 +76,7 @@
         </div>
     </div>
 
-    <!-- SCREEN 2: Flower Selection (unchanged) -->
+    <!-- SCREEN 2: Flower Selection -->
     <div id="screen-2" class="screen flex-col">
         <div class="max-w-md w-full mx-auto px-6 py-8">
             <div class="flex items-center justify-between mb-8">
@@ -98,7 +98,7 @@
         </div>
     </div>
 
-    <!-- SCREEN 3: Note Modification – improved layout & preview -->
+    <!-- SCREEN 3: Note Modification -->
     <div id="screen-3" class="screen flex-col">
         <div class="max-w-md w-full mx-auto px-6 py-10">
             <div class="flex items-center justify-between mb-8">
@@ -123,7 +123,6 @@
                 </div>
             </div>
 
-            <!-- Live preview of how the note will look -->
             <div class="note-card mx-auto max-w-[340px] mb-10">
                 <div id="note-preview" class="note-preview text-center text-xl leading-relaxed">
                     Dear My Love
@@ -139,7 +138,7 @@
         </div>
     </div>
 
-    <!-- SCREEN 4: Final Bouquet (unchanged logic, updated note display) -->
+    <!-- SCREEN 4: Final Bouquet -->
     <div id="screen-4" class="screen flex-col">
         <div class="max-w-md w-full mx-auto px-6 py-8">
             <div class="flex justify-between items-center mb-6">
@@ -162,7 +161,6 @@
                 </div>
             </div>
 
-            <!-- Share buttons (same as before) -->
             <div class="text-center">
                 <p class="text-emerald-700 font-medium mb-4">Share Your Creation</p>
                 <div class="flex gap-4 justify-center mb-6">
@@ -183,16 +181,16 @@
 
     <script>
         // ────────────────────────────────────────────────
-        // Data & State
+        // Data & State – UPDATED WITH WORKING PICSUM IDS
         // ────────────────────────────────────────────────
         let flowers = [
-            {name: "Sunflower", url: "https://picsum.photos/id/1015/300/300"},
-            {name: "Red Rose", url: "https://picsum.photos/id/133/300/300"},
-            {name: "Pink Peony", url: "https://picsum.photos/id/201/300/300"},
-            {name: "Tiger Lily", url: "https://picsum.photos/id/251/300/300"},
-            {name: "Orange Tulip", url: "https://picsum.photos/id/274/300/300"},
-            {name: "Purple Orchid", url: "https://picsum.photos/id/292/300/300"},
-            {name: "White Daisy", url: "https://picsum.photos/id/314/300/300"},
+            {name: "Sunflower", url: "https://picsum.photos/id/29/300/300"},      // sunflower field
+            {name: "Red Rose", url: "https://picsum.photos/id/106/300/300"},      // roses
+            {name: "Pink Peony", url: "https://picsum.photos/id/1080/300/300"},   // peony-like
+            {name: "Tiger Lily", url: "https://picsum.photos/id/180/300/300"},
+            {name: "Orange Tulip", url: "https://picsum.photos/id/104/300/300"},
+            {name: "Purple Orchid", url: "https://picsum.photos/id/870/300/300"}, // floral
+            {name: "White Daisy", url: "https://picsum.photos/id/20/300/300"},
             {name: "Blue Hydrangea", url: "https://picsum.photos/id/318/300/300"},
             {name: "Pink Carnation", url: "https://picsum.photos/id/326/300/300"},
             {name: "Red Chrysanthemum", url: "https://picsum.photos/id/340/300/300"},
@@ -221,7 +219,7 @@
         ];
 
         // ────────────────────────────────────────────────
-        // Functions
+        // Functions (unchanged except renderFlowers uses new URLs)
         // ────────────────────────────────────────────────
         function renderFlowers() {
             const grid = document.getElementById('flowers-grid');
@@ -229,9 +227,9 @@
             flowers.forEach((f, i) => {
                 const selected = selectedFlowers.some(s => s.name === f.name);
                 const div = document.createElement('div');
-                div.className = `flower-card bg-white rounded-2xl overflow-hidden border-4 cursor-pointer ${selected ? 'selected' : ''}`;
+                div.className = `flower-card bg-white rounded-2xl overflow-hidden border-4 cursor-pointer relative ${selected ? 'selected' : ''}`;
                 div.innerHTML = `
-                    <img src="${f.url}" class="w-full h-28 object-cover">
+                    <img src="\( {f.url}" class="w-full h-28 object-cover" alt=" \){f.name}">
                     <div class="p-2 text-center text-xs font-medium">${f.name}</div>
                     ${selected ? '<div class="absolute top-1 right-1 bg-emerald-600 text-white text-xs px-2 py-1 rounded-full">✓</div>' : ''}
                 `;
@@ -278,7 +276,7 @@
         }
 
         function createBouquet() {
-            updateNotePreview(); // final sync
+            updateNotePreview();
             goToScreen(4);
             renderCanvas();
         }
@@ -289,7 +287,6 @@
             ctx.fillStyle = '#fffaf0';
             ctx.fillRect(0,0,canvas.width,canvas.height);
 
-            // subtle background shape
             ctx.save();
             ctx.beginPath();
             ctx.ellipse(160, 210, 130, 170, 0, 0, Math.PI*2);
