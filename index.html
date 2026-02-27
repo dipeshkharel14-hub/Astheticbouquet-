@@ -3,183 +3,346 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Astheticbouquet | Powered by MR_DIPESH</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>AestheticBouquet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #FBF9F2; --accent: #000; }
-        body { background-color: #eee; margin: 0; font-family: 'Inter', sans-serif; }
-        
-        .app-container {
-            background-color: var(--bg);
-            max-width: 480px;
-            margin: 0 auto;
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .logo-font {
+            font-family: 'Playfair Display', cursive;
+        }
+        .screen {
+            display: none;
             min-height: 100vh;
+            background: linear-gradient(to bottom, #f9f5eb, #f0e6d2);
+        }
+        .screen-active {
             display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
-
-        header { text-align: center; padding: 20px 10px; }
-        .logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-style: italic; margin: 0; }
-        .subtitle { color: #444; margin: 5px 0 0; }
-
-        /* Canvas Switching Logic */
-        .canvas { display: none; padding: 20px; flex-direction: column; flex: 1; }
-        .canvas.active { display: flex; }
-
-        .btn {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 18px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-transform: uppercase;
-            margin-top: auto;
+        .bouquet-card {
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
         }
-
-        /* Canvas 1: Intro */
-        .hero-img { width: 100%; border-radius: 8px; margin: 20px 0; }
-
-        /* Canvas 2: Picker */
-        .flower-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
-            overflow-y: auto;
-            max-height: 50vh;
+        .flower-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .flower-item {
-            background: #fff;
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-            border: 2px solid transparent;
-            cursor: pointer;
+        .flower-card.selected {
+            border-color: #10b981;
+            transform: scale(1.05);
         }
-        .flower-item.selected { border-color: #ff6b6b; background: #fff5f5; }
-        .flower-item img { width: 60px; height: 60px; object-fit: contain; }
-        .counter { background: #000; color: #fff; padding: 5px 15px; border-radius: 20px; align-self: center; margin-bottom: 10px; }
-
-        /* Canvas 3: Note */
-        input, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
-        .note-preview { background: #fff; border: 1px solid #000; padding: 20px; box-shadow: 5px 5px 0 rgba(0,0,0,0.1); }
-
-        /* Canvas 4: Final */
-        .share-row { display: flex; gap: 10px; margin-top: 20px; }
-        .share-btn { flex: 1; padding: 12px; border: 1px solid #000; text-align: center; text-decoration: none; color: #000; border-radius: 8px; font-weight: 600; }
-
-        footer { text-align: center; padding: 20px; border-top: 1px solid #ddd; font-size: 0.8rem; }
-        footer a { color: #000; text-decoration: none; font-weight: 600; }
+        .note-card {
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border: 1px solid #e5e7eb;
+            border-radius: 1.5rem;
+            padding: 2.5rem 2rem;
+        }
+        .note-preview {
+            white-space: pre-line;
+            line-height: 1.8;
+        }
     </style>
 </head>
-<body>
+<body class="bg-[#f9f5eb] text-gray-900">
 
-<div class="app-container">
-    <header>
-        <h1 class="logo">Astheticbouquet</h1>
-        <p class="subtitle">Hi, build your unique bouquet!</p>
-    </header>
+    <!-- SCREEN 1: Landing -->
+    <div id="screen-1" class="screen screen-active flex-col items-center justify-center px-6 py-10">
+        <div class="max-w-md w-full text-center">
+            <h1 class="logo-font text-5xl text-emerald-800 mb-6">AestheticBouquet</h1>
+            <p class="text-2xl font-light mb-8">Hi, I made this bouquet for you!</p>
+            
+            <div class="bouquet-card bg-white rounded-3xl overflow-hidden mx-auto mb-10 w-full max-w-[340px]">
+                <img id="sample-bouquet" src="https://picsum.photos/id/870/800/900" alt="Bouquet" class="w-full h-[440px] object-cover">
+            </div>
 
-    <div id="canvas1" class="canvas active">
-        <img src="https://i.postimg.cc/85zXp9mX/realistic-bouquet-sample.jpg" class="hero-img" alt="Sample Bouquet">
-        <button class="btn" onclick="showCanvas(2)">Create 💐</button>
-    </div>
+            <div class="note-card mx-auto max-w-[340px] mb-12">
+                <div class="note-preview text-center text-xl">
+                    Dear [Recipient Name]
 
-    <div id="canvas2" class="canvas">
-        <div class="counter"><span id="count">0</span> / 20 Selected</div>
-        <p style="text-align:center; font-size: 0.9rem;">Pick minimum 10 flowers</p>
-        <div class="flower-grid" id="flowerGrid"></div>
-        <button class="btn" onclick="checkSelection()">Next</button>
-    </div>
+                    Sincerely,
+                    [Sender Name]
+                </div>
+            </div>
 
-    <div id="canvas3" class="canvas">
-        <input type="text" id="nameIn" placeholder="Dear [Name]" oninput="updateNote()">
-        <textarea id="msgIn" placeholder="Your message..." oninput="updateNote()"></textarea>
-        <input type="text" id="fromIn" placeholder="Sincerely, [Your Name]" oninput="updateNote()">
-        
-        <div class="note-preview">
-            <p>Dear <span id="pName">______</span>,</p>
-            <p id="pMsg" style="margin: 20px 0; font-style: italic;">Your message will appear here...</p>
-            <p style="text-align: right;">Sincerely, <span id="pFrom">______</span></p>
+            <button onclick="goToScreen(2)" class="w-full max-w-[340px] bg-emerald-700 hover:bg-emerald-800 text-white text-2xl py-6 rounded-3xl shadow-xl flex items-center justify-center gap-3">
+                Create Your Bouquet 💐
+            </button>
+
+            <div class="mt-12 text-sm text-gray-600 flex justify-center gap-8">
+                <div>Made by <a href="https://dipeshkharel.qzz.io" target="_blank" class="underline">dipeshkharel.qzz.io</a></div>
+                <div>Powered by mr_dipesh</div>
+            </div>
         </div>
-        <button class="btn" onclick="showCanvas(4)" style="margin-top: 20px;">Create Bouquet</button>
     </div>
 
-    <div id="canvas4" class="canvas">
-        <img src="https://i.postimg.cc/85zXp9mX/realistic-bouquet-sample.jpg" class="hero-img">
-        <div class="share-row">
-            <a href="#" class="share-btn" onclick="share('sms')">Share via Text</a>
-            <a href="#" class="share-btn" onclick="share('email')">Share via Email</a>
+    <!-- SCREEN 2: Flower Selection (unchanged) -->
+    <div id="screen-2" class="screen flex-col">
+        <div class="max-w-md w-full mx-auto px-6 py-8">
+            <div class="flex items-center justify-between mb-8">
+                <button onclick="goToScreen(1)" class="text-emerald-700">← Back</button>
+                <h1 class="logo-font text-4xl text-emerald-800">Choose Flowers</h1>
+                <div></div>
+            </div>
+            
+            <div class="text-center mb-6">
+                <p class="text-emerald-700 font-medium">Select <span class="font-bold">6 to 10</span> flowers</p>
+                <div id="selection-count" class="text-3xl font-semibold mt-1">0 / 10</div>
+            </div>
+            
+            <div id="flowers-grid" class="grid grid-cols-3 gap-4 mb-8"></div>
+            
+            <button id="next-btn" onclick="goToScreen(3)" disabled class="w-full bg-emerald-700 hover:bg-emerald-800 disabled:bg-gray-400 text-white text-xl py-5 rounded-3xl shadow-xl">
+                Next → Customize Note
+            </button>
         </div>
-        <p style="text-align:center; margin-top:20px;"><a href="#" style="color:#666;">VIEW GARDEN</a></p>
     </div>
 
-    <footer>
-        <p>MADE BY: <a href="https://dipeshkharel.qzz.io">dipeshkharel.qzz.io</a></p>
-        <p>POWERED BY: MR_DIPESH</p>
-        <p style="margin-top:10px;">Web Developer: <a href="https://www.instagram.com/its_mr_hsepid?igsh=amhuZGJxZ29nZjNu">@Its_mr_hsepid</a></p>
-    </footer>
-</div>
+    <!-- SCREEN 3: Note Modification – improved layout & preview -->
+    <div id="screen-3" class="screen flex-col">
+        <div class="max-w-md w-full mx-auto px-6 py-10">
+            <div class="flex items-center justify-between mb-8">
+                <button onclick="goToScreen(2)" class="text-emerald-700">← Back</button>
+                <h1 class="logo-font text-4xl text-emerald-800">Your Note</h1>
+                <div></div>
+            </div>
 
-<script>
-    const flowers = [
-        "Rose","Sunflower","Tulip","Orchid","Hibiscus","Lotus","Lily","Daisy","Lavender","Peony",
-        "Dahlia","Iris","Poppy","Marigold","Violet","Bluebell","Jasmine","Camellia","Zinnia","Petunia"
-    ];
-    let selected = [];
+            <div class="bg-white rounded-3xl p-8 shadow-xl mb-10">
+                <div class="space-y-8">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Dear (Recipient Name)</label>
+                        <input id="recipient-input" type="text" value="My Love" 
+                               class="w-full border-2 border-emerald-200 focus:border-emerald-600 rounded-xl px-5 py-4 text-xl outline-none">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sincerely (Your Name)</label>
+                        <input id="sender-input" type="text" value="Dipesh" 
+                               class="w-full border-2 border-emerald-200 focus:border-emerald-600 rounded-xl px-5 py-4 text-xl outline-none">
+                    </div>
+                </div>
+            </div>
 
-    function init() {
-        const grid = document.getElementById('flowerGrid');
-        flowers.forEach(f => {
-            const div = document.createElement('div');
-            div.className = 'flower-item';
-            div.innerHTML = `<img src="https://img.icons8.com/color/96/${f.toLowerCase()}.png" alt="${f}"><br><span>${f}</span>`;
-            div.onclick = () => toggle(f, div);
-            grid.appendChild(div);
-        });
-    }
+            <!-- Live preview of how the note will look -->
+            <div class="note-card mx-auto max-w-[340px] mb-10">
+                <div id="note-preview" class="note-preview text-center text-xl leading-relaxed">
+                    Dear My Love
 
-    function toggle(f, el) {
-        if (selected.includes(f)) {
-            selected = selected.filter(i => i !== f);
-            el.classList.remove('selected');
-        } else if (selected.length < 20) {
-            selected.push(f);
-            el.classList.add('selected');
+                    Sincerely,
+                    Dipesh
+                </div>
+            </div>
+
+            <button onclick="createBouquet()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white text-2xl py-6 rounded-3xl shadow-2xl flex items-center justify-center gap-3">
+                Create My Bouquet 💐
+            </button>
+        </div>
+    </div>
+
+    <!-- SCREEN 4: Final Bouquet (unchanged logic, updated note display) -->
+    <div id="screen-4" class="screen flex-col">
+        <div class="max-w-md w-full mx-auto px-6 py-8">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="goToScreen(1)" class="text-emerald-700">← New Bouquet</button>
+                <h1 class="logo-font text-4xl text-emerald-800">AestheticBouquet</h1>
+            </div>
+            
+            <p class="text-center text-2xl font-light mb-6">Hi, I made this bouquet for you!</p>
+            
+            <div class="relative mx-auto mb-8" style="width: 320px; height: 420px;">
+                <canvas id="bouquet-canvas" width="320" height="420" class="rounded-3xl shadow-2xl bg-[#fffaf0]"></canvas>
+            </div>
+            
+            <div class="note-card mx-auto max-w-[320px] mb-10">
+                <div id="final-note-preview" class="note-preview text-center text-xl leading-relaxed">
+                    Dear My Love
+
+                    Sincerely,
+                    Dipesh
+                </div>
+            </div>
+
+            <!-- Share buttons (same as before) -->
+            <div class="text-center">
+                <p class="text-emerald-700 font-medium mb-4">Share Your Creation</p>
+                <div class="flex gap-4 justify-center mb-6">
+                    <button onclick="shareViaText()" class="flex-1 bg-white border border-gray-700 hover:bg-gray-50 py-4 rounded-2xl flex items-center justify-center gap-2">
+                        <span class="text-2xl">💬</span> Text
+                    </button>
+                    <button onclick="shareViaEmail()" class="flex-1 bg-white border border-gray-700 hover:bg-gray-50 py-4 rounded-2xl flex items-center justify-center gap-2">
+                        <span class="text-2xl">✉️</span> Email
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-center text-sm text-gray-600 mt-10">
+                MADE BY <a href="https://dipeshkharel.qzz.io" target="_blank" class="underline">dipeshkharel.qzz.io</a> | POWERED BY mr_dipesh
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ────────────────────────────────────────────────
+        // Data & State
+        // ────────────────────────────────────────────────
+        let flowers = [
+            {name: "Sunflower", url: "https://picsum.photos/id/1015/300/300"},
+            {name: "Red Rose", url: "https://picsum.photos/id/133/300/300"},
+            {name: "Pink Peony", url: "https://picsum.photos/id/201/300/300"},
+            {name: "Tiger Lily", url: "https://picsum.photos/id/251/300/300"},
+            {name: "Orange Tulip", url: "https://picsum.photos/id/274/300/300"},
+            {name: "Purple Orchid", url: "https://picsum.photos/id/292/300/300"},
+            {name: "White Daisy", url: "https://picsum.photos/id/314/300/300"},
+            {name: "Blue Hydrangea", url: "https://picsum.photos/id/318/300/300"},
+            {name: "Pink Carnation", url: "https://picsum.photos/id/326/300/300"},
+            {name: "Red Chrysanthemum", url: "https://picsum.photos/id/340/300/300"},
+            {name: "Lavender", url: "https://picsum.photos/id/366/300/300"},
+            {name: "Jasmine", url: "https://picsum.photos/id/1016/300/300"},
+            {name: "Hibiscus", url: "https://picsum.photos/id/1021/300/300"},
+            {name: "Iris", url: "https://picsum.photos/id/1033/300/300"},
+            {name: "Daffodil", url: "https://picsum.photos/id/1040/300/300"},
+            {name: "Gerbera Daisy", url: "https://picsum.photos/id/1043/300/300"},
+            {name: "Anemone", url: "https://picsum.photos/id/1049/300/300"},
+            {name: "Ranunculus", url: "https://picsum.photos/id/1055/300/300"},
+            {name: "Alstroemeria", url: "https://picsum.photos/id/1060/300/300"},
+            {name: "Baby's Breath", url: "https://picsum.photos/id/1074/300/300"}
+        ];
+
+        let selectedFlowers = [];
+        let recipientName = "My Love";
+        let senderName = "Dipesh";
+
+        const bouquetPositions = [
+            {x:160,y:160,rot:-35,size:95},{x:230,y:130,rot:25,size:110},
+            {x:100,y:210,rot:-50,size:85},{x:260,y:190,rot:18,size:100},
+            {x:140,y:260,rot:-20,size:105},{x:210,y:240,rot:40,size:80},
+            {x:180,y:120,rot:-10,size:90},{x:240,y:280,rot:30,size:95},
+            {x:120,y:150,rot:-40,size:100},{x:200,y:200,rot:15,size:85}
+        ];
+
+        // ────────────────────────────────────────────────
+        // Functions
+        // ────────────────────────────────────────────────
+        function renderFlowers() {
+            const grid = document.getElementById('flowers-grid');
+            grid.innerHTML = '';
+            flowers.forEach((f, i) => {
+                const selected = selectedFlowers.some(s => s.name === f.name);
+                const div = document.createElement('div');
+                div.className = `flower-card bg-white rounded-2xl overflow-hidden border-4 cursor-pointer ${selected ? 'selected' : ''}`;
+                div.innerHTML = `
+                    <img src="${f.url}" class="w-full h-28 object-cover">
+                    <div class="p-2 text-center text-xs font-medium">${f.name}</div>
+                    ${selected ? '<div class="absolute top-1 right-1 bg-emerald-600 text-white text-xs px-2 py-1 rounded-full">✓</div>' : ''}
+                `;
+                div.onclick = () => toggleFlower(i);
+                grid.appendChild(div);
+            });
         }
-        document.getElementById('count').innerText = selected.length;
-    }
 
-    function showCanvas(n) {
-        document.querySelectorAll('.canvas').forEach(c => c.classList.remove('active'));
-        document.getElementById('canvas' + n).classList.add('active');
-        window.scrollTo(0,0);
-    }
+        function toggleFlower(idx) {
+            const f = flowers[idx];
+            const pos = selectedFlowers.findIndex(s => s.name === f.name);
+            if (pos !== -1) {
+                selectedFlowers.splice(pos, 1);
+            } else {
+                if (selectedFlowers.length >= 10) return alert("Max 10 flowers allowed");
+                selectedFlowers.push(f);
+            }
+            updateCount();
+            renderFlowers();
+        }
 
-    function checkSelection() {
-        if (selected.length < 10) alert("Please select at least 10 flowers!");
-        else showCanvas(3);
-    }
+        function updateCount() {
+            document.getElementById('selection-count').textContent = `${selectedFlowers.length} / 10`;
+            document.getElementById('next-btn').disabled = selectedFlowers.length < 6;
+        }
 
-    function updateNote() {
-        document.getElementById('pName').innerText = document.getElementById('nameIn').value || "______";
-        document.getElementById('pMsg').innerText = document.getElementById('msgIn').value || "Your message will appear here...";
-        document.getElementById('pFrom').innerText = document.getElementById('fromIn').value || "______";
-    }
+        function goToScreen(n) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('screen-active'));
+            document.getElementById(`screen-${n}`).classList.add('screen-active');
+            if (n === 2) {
+                renderFlowers();
+                updateCount();
+            }
+            if (n === 3) updateNotePreview();
+        }
 
-    function share(type) {
-        const text = `I made a bouquet for you on Astheticbouquet! Check it out at ${window.location.href}`;
-        if (type === 'sms') window.location.href = `sms:?body=${encodeURIComponent(text)}`;
-        else window.location.href = `mailto:?subject=A Gift for You&body=${encodeURIComponent(text)}`;
-    }
+        function updateNotePreview() {
+            recipientName = document.getElementById('recipient-input').value.trim() || "My Love";
+            senderName = document.getElementById('sender-input').value.trim() || "Dipesh";
 
-    init();
-</script>
+            const previewText = `Dear \( {recipientName}\n\nSincerely,\n \){senderName}`;
+            document.getElementById('note-preview').textContent = previewText;
+            document.getElementById('final-note-preview').textContent = previewText;
+        }
 
+        function createBouquet() {
+            updateNotePreview(); // final sync
+            goToScreen(4);
+            renderCanvas();
+        }
+
+        function renderCanvas() {
+            const canvas = document.getElementById('bouquet-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#fffaf0';
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+
+            // subtle background shape
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(160, 210, 130, 170, 0, 0, Math.PI*2);
+            ctx.fillStyle = '#f8f1e8';
+            ctx.fill();
+            ctx.restore();
+
+            Promise.all(selectedFlowers.map(f => {
+                return new Promise(r => {
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    img.src = f.url;
+                    img.onload = () => r(img);
+                    img.onerror = () => r(null);
+                });
+            })).then(imgs => {
+                ctx.shadowColor = 'rgba(0,0,0,0.2)';
+                ctx.shadowBlur = 12;
+                ctx.shadowOffsetY = 8;
+
+                imgs.forEach((img, i) => {
+                    if (!img) return;
+                    const p = bouquetPositions[i];
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot * Math.PI / 180);
+                    ctx.drawImage(img, -p.size/2, -p.size/2, p.size, p.size);
+                    ctx.restore();
+                });
+            });
+        }
+
+        function shareViaText() {
+            const msg = `💐 Hi, I made this bouquet for ${recipientName}!\n\nWith: ${selectedFlowers.map(f=>f.name).join(', ')}\n\nMade with AestheticBouquet`;
+            if (navigator.share) {
+                navigator.share({title:"My Bouquet", text:msg});
+            } else {
+                window.open(`sms:?body=${encodeURIComponent(msg)}`, '_blank');
+            }
+        }
+
+        function shareViaEmail() {
+            const subject = `A bouquet just for you 💐`;
+            const body = `Dear \( {recipientName},\n\nI made this bouquet with:\n \){selectedFlowers.map((f,i)=>`  ${i+1}. ${f.name}`).join('\n')}\n\nMade with AestheticBouquet by dipeshkharel.qzz.io`;
+            window.location.href = `mailto:?subject=\( {encodeURIComponent(subject)}&body= \){encodeURIComponent(body)}`;
+        }
+
+        // Init
+        window.onload = () => {
+            document.getElementById('recipient-input').addEventListener('input', updateNotePreview);
+            document.getElementById('sender-input').addEventListener('input', updateNotePreview);
+            goToScreen(1);
+        };
+    </script>
 </body>
 </html>
