@@ -8,24 +8,23 @@
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
   body{background:#f9f5f2;}
-  canvas{border:1px solid #ccc;margin:10px auto;display:block;background:#fff;}
-  #container{width:95%;max-width:1200px;margin:20px auto;text-align:center;}
-  button{padding:10px 20px;margin:15px;font-size:16px;border:none;background:#ff5f5f;color:white;border-radius:8px;cursor:pointer;}
+  canvas{display:block;margin:20px auto;background:#fff;border:1px solid #ccc;}
+  #container{text-align:center;width:95%;max-width:1200px;margin:auto;}
+  button{padding:12px 22px;margin:15px;font-size:16px;border:none;background:#ff5f5f;color:#fff;border-radius:8px;cursor:pointer;}
   button:disabled{background:#ccc;cursor:not-allowed;}
   .hidden{display:none;}
-  .flower-selection{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:20px;}
-  .flower-card{width:120px;text-align:center;cursor:pointer;border:2px solid transparent;border-radius:10px;padding:5px;}
-  .flower-card.selected{border-color:#ff5f5f;background:#ffeaea;}
-  img{width:100px;height:100px;object-fit:cover;border-radius:10px;}
-  textarea{width:90%;max-width:600px;height:100px;margin:10px auto;padding:10px;font-size:16px;border-radius:10px;border:1px solid #ccc;display:block;}
-  .share-buttons{margin-top:10px;}
+  .flower-selection{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:20px;}
+  .flower-card{width:120px;text-align:center;cursor:pointer;border:2px solid transparent;border-radius:10px;padding:6px;}
+  .flower-card.selected{border:#ff5f5f 2px solid;background:#ffeaea;}
+  img{width:100px;height:100px;object-fit:contain;border-radius:10px;}
+  textarea{width:90%;max-width:600px;height:100px;margin:12px auto;padding:10px;font-size:16px;border:1px solid #ccc;border-radius:10px;display:block;}
 </style>
 </head>
 <body>
 
 <div id="container">
 
-  <!-- Canvas 1: Sample Bouquet with Note -->
+  <!-- Canvas 1: Sample Bouquet -->
   <div id="canvas1">
     <canvas id="sampleCanvas" width="600" height="400"></canvas>
     <h2>AstheticBouquet</h2>
@@ -34,22 +33,22 @@
 
   <!-- Canvas 2: Flower Selection -->
   <div id="canvas2" class="hidden">
-    <h2>Select Your Flowers (Min 6, Max 10)</h2>
+    <h2>Select Your Flowers (6–10)</h2>
     <div class="flower-selection" id="flowerSelection"></div>
     <button id="nextBtn2" disabled>Next</button>
   </div>
 
-  <!-- Canvas 3: Note Modification -->
+  <!-- Canvas 3: Edit Note -->
   <div id="canvas3" class="hidden">
     <h2>Modify Your Note</h2>
-    <textarea id="noteText">Dear Friend, Wishing you a wonderful day filled with happiness and love.</textarea>
+    <textarea id="noteText">Dear Friend, Wishing you a wonderful day filled with love and happiness!</textarea>
     <button id="createBouquetBtn">Create Bouquet 💐</button>
   </div>
 
-  <!-- Canvas 4: Final Bouquet with Sharing -->
+  <!-- Canvas 4: Final Bouquet -->
   <div id="canvas4" class="hidden">
     <canvas id="finalCanvas" width="600" height="500"></canvas>
-    <div class="share-buttons">
+    <div>
       <button id="shareTextBtn">Share via Text</button>
       <button id="shareEmailBtn">Share via Email</button>
     </div>
@@ -58,147 +57,133 @@
 </div>
 
 <script>
-const sampleCanvas = document.getElementById('sampleCanvas');
-const ctxSample = sampleCanvas.getContext('2d');
-const createBtn1 = document.getElementById('createBtn1');
+// Canvas refs
+const sampleCanvas=document.getElementById('sampleCanvas');
+const ctxSample=sampleCanvas.getContext('2d');
+const finalCanvas=document.getElementById('finalCanvas');
+const ctxFinal=finalCanvas.getContext('2d');
 
-const canvas1 = document.getElementById('canvas1');
-const canvas2 = document.getElementById('canvas2');
-const canvas3 = document.getElementById('canvas3');
-const canvas4 = document.getElementById('canvas4');
+// Screens
+const canvas1=document.getElementById('canvas1');
+const canvas2=document.getElementById('canvas2');
+const canvas3=document.getElementById('canvas3');
+const canvas4=document.getElementById('canvas4');
 
-const flowerSelectionDiv = document.getElementById('flowerSelection');
-const nextBtn2 = document.getElementById('nextBtn2');
-const noteText = document.getElementById('noteText');
-const createBouquetBtn = document.getElementById('createBouquetBtn');
-const finalCanvas = document.getElementById('finalCanvas');
-const ctxFinal = finalCanvas.getContext('2d');
-const shareTextBtn = document.getElementById('shareTextBtn');
-const shareEmailBtn = document.getElementById('shareEmailBtn');
+// Buttons
+const createBtn1=document.getElementById('createBtn1');
+const nextBtn2=document.getElementById('nextBtn2');
+const createBouquetBtn=document.getElementById('createBouquetBtn');
+const shareTextBtn=document.getElementById('shareTextBtn');
+const shareEmailBtn=document.getElementById('shareEmailBtn');
+const noteText=document.getElementById('noteText');
 
-// Sample bouquet canvas
-function drawSampleBouquet() {
-    ctxSample.fillStyle = "#fff0f0";
-    ctxSample.fillRect(0,0,600,400);
-    ctxSample.fillStyle = "#ff5f5f";
-    ctxSample.font = "bold 24px Poppins";
-    ctxSample.fillText("AstheticBouquet", 200, 50);
-    ctxSample.fillStyle = "#000";
-    ctxSample.font = "16px Poppins";
-    ctxSample.fillText("Sample Note: Wishing you happiness and love!", 50, 380);
-    // Simple bouquet illustration
-    ctxSample.beginPath();
-    ctxSample.arc(300, 200, 60, 0, Math.PI*2);
-    ctxSample.fillStyle = "#ffb6c1";
-    ctxSample.fill();
-    ctxSample.beginPath();
-    ctxSample.moveTo(300,260);
-    ctxSample.lineTo(300,350);
-    ctxSample.strokeStyle = "#8b4513";
-    ctxSample.lineWidth = 10;
-    ctxSample.stroke();
-}
-drawSampleBouquet();
-
-// Flower data (20 flowers)
-const flowers = [
-  {name:"Rose",img:"https://i.ibb.co/ZYW3VTp/brown-brim.png"},
-  {name:"Lily",img:"https://i.ibb.co/1vgyXkL/lily.png"},
-  {name:"Tulip",img:"https://i.ibb.co/7vX0ShX/tulip.png"},
-  {name:"Sunflower",img:"https://i.ibb.co/5k6yghZ/sunflower.png"},
-  {name:"Daisy",img:"https://i.ibb.co/NtS6dqG/daisy.png"},
-  {name:"Orchid",img:"https://i.ibb.co/Y0V5Xr1/orchid.png"},
-  {name:"Carnation",img:"https://i.ibb.co/ZYW3VTp/brown-brim.png"},
-  {name:"Peony",img:"https://i.ibb.co/7vX0ShX/tulip.png"},
-  {name:"Lavender",img:"https://i.ibb.co/Y0V5Xr1/orchid.png"},
-  {name:"Marigold",img:"https://i.ibb.co/5k6yghZ/sunflower.png"},
-  {name:"Jasmine",img:"https://i.ibb.co/NtS6dqG/daisy.png"},
-  {name:"Gardenia",img:"https://i.ibb.co/1vgyXkL/lily.png"},
-  {name:"Hydrangea",img:"https://i.ibb.co/ZYW3VTp/brown-brim.png"},
-  {name:"Chrysanthemum",img:"https://i.ibb.co/7vX0ShX/tulip.png"},
-  {name:"Iris",img:"https://i.ibb.co/Y0V5Xr1/orchid.png"},
-  {name:"Forget-Me-Not",img:"https://i.ibb.co/5k6yghZ/sunflower.png"},
-  {name:"Magnolia",img:"https://i.ibb.co/NtS6dqG/daisy.png"},
-  {name:"Poppy",img:"https://i.ibb.co/1vgyXkL/lily.png"},
-  {name:"Violet",img:"https://i.ibb.co/ZYW3VTp/brown-brim.png"},
-  {name:"Camellia",img:"https://i.ibb.co/7vX0ShX/tulip.png"}
+// 15 Real Flower PNG URLs (transparent)
+const realFlowers = [
+  "https://purepng.com/public/uploads/large/purepng.com-flower-flower-planta-981524661594hxtx.png",
+  "https://purepng.com/public/uploads/large/purepng.com-flower-flower-planta-vis1.png",
+  "https://purepng.com/public/uploads/large/purepng.com-rose-flowerplantrosesblossombudbloomfloralflora-811524662696ehixt.png",
+  "https://purepng.com/public/uploads/large/purepng.com-flower-floraorchidbotanicialpetalbeautifulplant-11115246692b7u0c.png",
+  "https://purepng.com/public/uploads/large/purepng.com-flower-flower-stemfloralfloraamaryllisbulbbotanical-461524664780psksd.png",
+  "https://purepng.com/public/uploads/large/purepng.com-flower-flowerpetalsfloraflowerbouquetplantflower-84152466648p25fd.png",
+  "https://purepng.com/public/uploads/large/purepng.com-flower-flowerquet-bunchrosesplantbouquet-floralsdecorativeflower-9815246662419lmu.png",
+  "https://purepng.com/public/uploads/large/purepng.com-flower-flowerboleafpetalsblossombotanegarden-12115246628607k9p.png",
+  "https://purepng.com/public/uploads/large/purepng.com-flower-flowerpetalleafpinkrosesgardenflora-3011524667858kfj.png",
+  "https://purepng.com/public/uploads/large/purepng.com-flower-flowergarden-85152466867swan.png",
+  "https://purepng.com/public/uploads/large/purepng.com-flower-bouquetfloralbouquet-671152466691o0kb.png",
+  "https://toppng.com/freepng/flower-bouquet-PNG-free-PNG-Images_19012", // bouquet PNG 1
+  "https://toppng.com/freepng/bouquet-of-flowers-transparent-image-PNG-image_19168",    // larger bouquet 2
+  "https://toppng.com/free-image/bouquet-flowers-png-transparent-images-free-download-flower-bouquet-PNG-free-PNG-Images_200191", // more bouquet 3
+  "https://toppng.com/free-image/public-domain-watercolor-flowers-PNG-free-PNG-Images_78575" // watercolor style 4
 ];
 
-let selectedFlowers = [];
+let selectedFlowers=[];
+
+// Draw sample preview on start
+function drawSample(){
+  ctxSample.fillStyle="#fff8f5";
+  ctxSample.fillRect(0,0,600,400);
+  ctxSample.font="bold 24px Poppins";
+  ctxSample.fillStyle="#ff5f5f";
+  ctxSample.fillText("AstheticBouquet Sample",180,50);
+  const img=new Image();
+  img.src=realFlowers[11];
+  img.onload=()=>ctxSample.drawImage(img,150,120,300,200);
+}
+drawSample();
 
 // Populate flower selection
-flowers.forEach((f,idx)=>{
-    const div = document.createElement('div');
-    div.className="flower-card";
-    div.innerHTML=`<img src="${f.img}" alt="${f.name}"><div>${f.name}</div>`;
-    div.onclick = ()=>{
-        if(div.classList.contains('selected')){
-            div.classList.remove('selected');
-            selectedFlowers = selectedFlowers.filter(x=>x!==idx);
-        }else{
-            if(selectedFlowers.length<10){
-                div.classList.add('selected');
-                selectedFlowers.push(idx);
-            }
-        }
-        nextBtn2.disabled = selectedFlowers.length<6;
-    };
-    flowerSelectionDiv.appendChild(div);
+const selectionDiv=document.getElementById('flowerSelection');
+realFlowers.forEach((url,idx)=>{
+  const card=document.createElement('div');
+  card.className="flower-card";
+  card.innerHTML=`<img src="${url}"><div>Flower ${idx+1}</div>`;
+  card.onclick=()=>{
+    if(card.classList.contains("selected")){
+      card.classList.remove("selected");
+      selectedFlowers = selectedFlowers.filter(i=>i!==idx);
+    } else if(selectedFlowers.length < 10){
+      card.classList.add("selected");
+      selectedFlowers.push(idx);
+    }
+    nextBtn2.disabled = selectedFlowers.length < 6;
+  };
+  selectionDiv.appendChild(card);
 });
 
-// Navigation buttons
-createBtn1.onclick = ()=>{
-    canvas1.classList.add('hidden');
-    canvas2.classList.remove('hidden');
+// Navigation
+createBtn1.onclick=()=>{
+  canvas1.classList.add("hidden");
+  canvas2.classList.remove("hidden");
 };
 
-nextBtn2.onclick = ()=>{
-    canvas2.classList.add('hidden');
-    canvas3.classList.remove('hidden');
+nextBtn2.onclick=()=>{
+  canvas2.classList.add("hidden");
+  canvas3.classList.remove("hidden");
 };
 
-createBouquetBtn.onclick = ()=>{
-    canvas3.classList.add('hidden');
-    canvas4.classList.remove('hidden');
-    drawFinalBouquet();
+createBouquetBtn.onclick=()=>{
+  canvas3.classList.add("hidden");
+  canvas4.classList.remove("hidden");
+  drawFinal();
 };
 
-// Draw final bouquet
-function drawFinalBouquet(){
-    ctxFinal.clearRect(0,0,600,500);
-    ctxFinal.fillStyle = "#fff8f5";
-    ctxFinal.fillRect(0,0,600,500);
-    ctxFinal.fillStyle="#ff5f5f";
-    ctxFinal.font="bold 24px Poppins";
-    ctxFinal.fillText("AstheticBouquet", 200, 40);
-    ctxFinal.font="16px Poppins";
-    ctxFinal.fillStyle="#000";
-    ctxFinal.fillText(noteText.value, 50, 460);
-    ctxFinal.font="12px Poppins";
-    ctxFinal.fillText("Made by: dipeshkharel.qzz.io | Powered by: mr_dipesh", 150, 480);
+// Draw final bouquet layout
+function drawFinal(){
+  ctxFinal.fillStyle="#fff8f5";
+  ctxFinal.fillRect(0,0,600,500);
 
-    // Random bouquet positions
-    selectedFlowers.forEach((f,idx)=>{
-        let x = 100 + (idx%5)*90;
-        let y = 150 + Math.floor(idx/5)*80;
-        let img = new Image();
-        img.src = flowers[f].img;
-        img.onload = ()=>{
-            ctxFinal.drawImage(img, x, y, 80, 80);
-        }
-    });
+  // draw flowers in grid
+  selectedFlowers.forEach((i,index)=>{
+    const img=new Image();
+    img.src=realFlowers[i];
+    img.onload=()=>{
+      const x=50 + (index % 5) * 100;
+      const y=90 + Math.floor(index/5) * 100;
+      ctxFinal.drawImage(img, x, y, 80, 80);
+    }
+  });
+
+  ctxFinal.font="bold 24px Poppins";
+  ctxFinal.fillStyle="#ff5f5f";
+  ctxFinal.fillText("AstheticBouquet",180,40);
+
+  ctxFinal.font="18px Poppins";
+  ctxFinal.fillStyle="#000";
+  ctxFinal.fillText(noteText.value,60,470);
+
+  ctxFinal.font="12px Poppins";
+  ctxFinal.fillStyle="#777";
+  ctxFinal.fillText("Made by: dipeshkharel.qzz.io | Powered by: mr_dipesh",90,495);
 }
 
 // Sharing
-shareTextBtn.onclick = ()=>{
-    const shareContent = `Check my AstheticBouquet: ${noteText.value}`;
-    navigator.clipboard.writeText(shareContent).then(()=>alert("Text copied to clipboard!"));
+shareTextBtn.onclick=()=>{
+  navigator.clipboard.writeText(noteText.value).then(()=>alert("Copied!"));
 };
-
-shareEmailBtn.onclick = ()=>{
-    const subject = encodeURIComponent("My AstheticBouquet");
-    const body = encodeURIComponent(noteText.value);
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+shareEmailBtn.onclick=()=>{
+  const subj=encodeURIComponent("My AstheticBouquet");
+  const body=encodeURIComponent(noteText.value);
+  window.location.href=`mailto:?subject=${subj}&body=${body}`;
 };
 </script>
 
